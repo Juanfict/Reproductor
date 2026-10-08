@@ -72,19 +72,72 @@ class MainActivity : AppCompatActivity() {
 
         cargarCancion()
 
+        binding.btnPlay.setOnClickListener {
+
+            if (mediaPlayer?.isPlaying == true) {
+
+                handler.removeCallbacks(runnable)
+                binding.btnPlay.setImageResource(R.drawable.ic_reproducir)
+                mediaPlayer?.pause()
+            }else{
+
+                handler.removeCallbacks(runnable)
+                handler.post(runnable)
+                binding.btnPlay.setImageResource(R.drawable.ic_pausar)
+                mediaPlayer?.start()
+            }
+        }
+        binding.btnSiguiente.setOnClickListener {
+            if (enCurso < datos.size - 1) {
+                enCurso++
+                cargarCancion()
+                binding.btnAnterior.isClickable = true
+                binding.btnAnterior.alpha = 1F
+            }
+            if (enCurso == datos.size - 1) {
+                binding.btnSiguiente.isClickable = false
+                binding.btnSiguiente.alpha = 0.5F
+            }
+
+        }
+
+        binding.btnAnterior.setOnClickListener {
+            if (enCurso > 0) {
+                enCurso--
+                cargarCancion()
+                binding.btnSiguiente.isClickable = true
+                binding.btnSiguiente.alpha = 1F
+            }
+            if (enCurso == 0) {
+                binding.btnAnterior.isClickable = false
+                binding.btnAnterior.alpha = 0.5F
+            }
+        }
     }
 
     private fun cargarCancion(){
         handler.removeCallbacks(runnable)
         mediaPlayer?.release()
-        MediaPlayer.create(this,datos[enCurso].pista)
+        mediaPlayer = MediaPlayer.create(this,datos[enCurso].pista)
         binding.tTitulo.text = datos[enCurso].titulo
         binding.tArtista.text = datos[enCurso].autor
         binding.tTotal.text = (mediaPlayer!!.duration/1000).toString()
 
         binding.seekBar.max = mediaPlayer!!.duration/1000
         binding.seekBar.progress = 0
+        binding.btnPlay.setImageResource(R.drawable.ic_reproducir)
 
+        if (enCurso == 0) {
+            binding.btnAnterior.isClickable = false
+            binding.btnAnterior.alpha = 0.5F
+        }
+
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        mediaPlayer?.release()
+        mediaPlayer = null
     }
 
 }
