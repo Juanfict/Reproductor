@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.reproductor.databinding.ActivityMainBinding
+import java.util.Locale
 
 class MainActivity : AppCompatActivity() {
 
@@ -20,10 +21,10 @@ class MainActivity : AppCompatActivity() {
 
     private val runnable = object : Runnable {
         override fun run() {
-            if(mediaPlayer?.isPlaying == true)
-
-                binding.seekBar.progress = mediaPlayer!!.currentPosition/1000
+            if(mediaPlayer?.isPlaying == true) {
+                binding.seekBar.progress = mediaPlayer!!.currentPosition / 1000
                 handler.postDelayed(this, 1000)
+            }
         }
     }
     private var enCurso:Int = 0
@@ -53,7 +54,7 @@ class MainActivity : AppCompatActivity() {
                     fromUser: Boolean
                 ) {
                     binding.tContador.text =
-                        "$progress"
+                        formatearTiempo(progress)
                 }
 
                 override fun onStartTrackingTouch(seekBar: SeekBar?) {}
@@ -121,7 +122,7 @@ class MainActivity : AppCompatActivity() {
         mediaPlayer = MediaPlayer.create(this,datos[enCurso].pista)
         binding.tTitulo.text = datos[enCurso].titulo
         binding.tArtista.text = datos[enCurso].autor
-        binding.tTotal.text = (mediaPlayer!!.duration/1000).toString()
+        binding.tTotal.text = formatearTiempo(mediaPlayer!!.duration/1000)
 
         binding.seekBar.max = mediaPlayer!!.duration/1000
         binding.seekBar.progress = 0
@@ -132,6 +133,13 @@ class MainActivity : AppCompatActivity() {
             binding.btnAnterior.alpha = 0.5F
         }
 
+    }
+
+    fun formatearTiempo(tiempo:Int):String{
+        val minutos = tiempo/60
+        val segundos = tiempo % 60
+
+        return String.format(Locale.getDefault(),"%02d:%02d",minutos,segundos)
     }
 
     override fun onDestroy() {
